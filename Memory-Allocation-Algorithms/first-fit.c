@@ -1,45 +1,50 @@
-#include <stdio.h> 
-#define max 25 
+#include <stdio.h>
+#include <string.h>
 
-void main()
+void firstFit(int *blocks, int *files, int *alloc, int nb, int nf)
 {
-    int frag[max], b[max], f[max], i, j, nb, nf, temp;
-    static int bf[max], ff[max];
-    printf("\nEnter the number of blocks:");
-    scanf("%d", &nb);
-    printf("Enter the number of files:");
-    scanf("%d", &nf);
-    printf("\nEnter the size of the blocks:-\n");
-    for (i = 1; i <= nb; i++)
+    for (int i = 0; i < nf; i++)
     {
-        printf("Block %d:", i);
-        scanf("%d", &b[i]);
-    }
-    printf("\nEnter the size of the files:-\n");
-    for (i = 1; i <= nf; i++)
-    {
-        printf("File %d:", i);
-        scanf("%d", &f[i]);
-    }
-    for (i = 1; i <= nf; i++)
-    {
-        for (j = 1; j <= nb; j++)
+        for (int j = 0; j < nb; j++)
         {
-            if (bf[j] != 1)
+            if (files[i] <= blocks[j])
             {
-                temp = b[j] - f[i];
-                if (temp >= 0)
-                {
-                    ff[i] = j;
-                    break;
-                }
+                alloc[i] = j;
+                blocks[j] -= files[i];
+                break;
             }
         }
-        frag[i] = temp;
-        bf[ff[i]] = 1;
     }
-    printf("\nFile_no:\tFile_size:\tBlock_no:\tBlock_size:\tFragment");
-
-    for (i = 1; i <= nf; i++)
-        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);
+    printf("File No.\tFile Size\tBlock Alloted\n");
+    for (int i = 0; i < nf; i++)
+    {
+        if (alloc[i] != -1)
+            printf("%d\t\t%d\t\t%d\n", i + 1, files[i], alloc[i] + 1);
+        else
+            printf("%d\t\t%d\t\tNot Alloted\n", i + 1, files[i]);
+    }
+}
+int main()
+{
+    int nb, nf;
+    printf("Enter the number of blocks: ");
+    scanf("%d", &nb);
+    printf("Enter the number of files ");
+    scanf("%d", &nf);
+    int blocks[nb], files[nf], alloc[nf];
+    memset(alloc, -1, sizeof(alloc));
+    printf("Enter the size of Blocks: \n");
+    for (int i = 0; i < nb; i++)
+    {
+        printf("Block %d ", i + 1);
+        scanf("%d", &blocks[i]);
+    }
+    printf("Enter the size of Files: \n");
+    for (int i = 0; i < nf; i++)
+    {
+        printf("File %d ", i + 1);
+        scanf("%d", &files[i]);
+    }
+    firstFit(blocks, files, alloc, nb, nf);
+    return 0;
 }

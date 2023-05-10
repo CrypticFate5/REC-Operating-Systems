@@ -1,47 +1,55 @@
 #include <stdio.h>
 #include <string.h>
-
-void bestFit(int blockSize[], int m, int processSize[], int n)
+#include <limits.h>
+void bestFit(int *blocks, int *files, int *alloc, int nb, int nf)
 {
-    int allocation[n];
-    memset(allocation, -1, sizeof(allocation));
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < nf; i++)
     {
-        int bestIdx = -1;
-        for (int j = 0; j < m; j++)
+        int diff = INT_MAX, k = -1;
+        for (int j = 0; j < nb; j++)
         {
-            if (blockSize[j] >= processSize[i])
+            if (blocks[j] - files[i] <= diff && files[i] <= blocks[j])
             {
-                if (bestIdx == -1)
-                    bestIdx = j;
-                else if (blockSize[bestIdx] > blockSize[j])
-                    bestIdx = j;
+                k = j;
+                diff = blocks[j] - files[i];
             }
         }
-        if (bestIdx != -1)
+        if (k != -1)
         {
-            allocation[i] = bestIdx;
-            blockSize[bestIdx] -= processSize[i];
+            alloc[i] = k;
+            blocks[k] -= files[i];
         }
     }
-    printf("\nProcess No. \tProcessSize\tBlock no. \n");
-    for (int i = 0; i < n; i++)
+    printf("File No.\tFile Size\tBlock Alloted\n");
+    for (int i = 0; i < nf; i++)
     {
-        printf("%d \t\t %d ", i + 1, processSize[i]);
-        if (allocation[i] != -1)
-            printf("\t\t%d", allocation[i] + 1);
+        if (alloc[i] != -1)
+            printf("%d\t\t%d\t\t%d\n", i + 1, files[i], alloc[i] + 1);
         else
-            printf("\n Not Allocated");
-        printf("\n");
+            printf("%d\t\t%d\t\tNot Alloted\n", i + 1, files[i]);
     }
 }
 int main()
 {
-    int blockSize[] = {100, 500, 200, 300, 600};
-    int processSize[] = {212, 417, 112, 426};
-
-    int m = sizeof(blockSize) / sizeof(blockSize[0]);
-    int n = sizeof(processSize) / sizeof(processSize[0]);
-    bestFit(blockSize, m, processSize, n);
+    int nb, nf;
+    printf("Enter the number of blocks: ");
+    scanf("%d", &nb);
+    printf("Enter the number of files ");
+    scanf("%d", &nf);
+    int blocks[nb], files[nf], alloc[nf];
+    memset(alloc, -1, sizeof(alloc));
+    printf("Enter the size of Blocks: \n");
+    for (int i = 0; i < nb; i++)
+    {
+        printf("Block %d ", i + 1);
+        scanf("%d", &blocks[i]);
+    }
+    printf("Enter the size of Files: \n");
+    for (int i = 0; i < nf; i++)
+    {
+        printf("File %d ", i + 1);
+        scanf("%d", &files[i]);
+    }
+    bestFit(blocks, files, alloc, nb, nf);
     return 0;
 }
